@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>今天吃什么？情侣甜蜜点餐单 💕</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Google Fonts: 思源黑体与马善政毛笔体/圆润字体 -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+    <!-- 引入 FontAwesome 图标 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Noto Sans SC"', 'sans-serif'],
+                        cute: ['"ZCOOL KuaiLe"', 'cursive', 'sans-serif'],
+                    },
+                    colors: {
+                        rose: {
+                            50: '#fff1f2',
+                            100: '#ffe4e6',
+                            200: '#fecdd3',
+                            300: '#fda4af',
+                            400: '#fb7185',
+                            500: '#f43f5e',
+                            600: '#e11d48',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* 自定义渐变背景与动画 */
+        body {
+            background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 50%, #fdf2f8 100%);
+            min-height: 100vh;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+        }
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes pulse-heart {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+        .animate-heart {
+            display: inline-block;
+            animation: pulse-heart 1.5s infinite;
+        }
+        /* 隐藏滚动条但保留滚动功能 */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="text-gray-700 antialiased selection:bg-rose-200 selection:text-rose-700 pb-20">
+
+    <!-- 顶部浪漫导航/标题区 -->
+    <header class="pt-8 pb-6 px-4 text-center relative overflow-hidden">
+        <div class="max-w-2xl mx-auto">
+            <div class="inline-flex items-center justify-center px-4 py-1.5 mb-3 rounded-full bg-white/80 text-rose-500 text-sm font-medium shadow-sm border border-rose-100">
+                <span class="animate-heart mr-1.5">💖</span> 专属投喂计划 · 拒绝选择困难症
+            </div>
+            <h1 class="text-3xl sm:text-4xl font-cute text-rose-600 tracking-wide drop-shadow-sm">
+                亲爱的，今天想吃点什么？
+            </h1>
+            <p class="mt-2 text-sm sm:text-base text-gray-500">
+                选好想吃的美食和你的小要求，一键发送邮件召唤专属大厨 / 外卖员吧！
+            </p>
+        </div>
+    </header>
+
+    <!-- 主内容区域 -->
+    <main class="max-w-3xl mx-auto px-4 space-y-6">
+
+        <!-- 步骤 1: 纠结救星（随机抽签） + 分类切换 -->
+        <section class="glass-card rounded-3xl p-5 sm:p-6 shadow-lg shadow-rose-100/50">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-rose-100 pb-4">
+                <div>
+                    <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                        <span class="w-7 h-7 rounded-full bg-rose-500 text-white flex items-center justify-center text-sm">1</span>
+                        挑选心仪美食
+                    </h2>
+                    <p class="text-xs text-gray-400 mt-0.5">支持多选，也可以自己添加想吃的哦</p>
+                </div>
+                <!-- 随机帮你选按钮 -->
+                <button onclick="openRandomModal()" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-500 hover:to-orange-500 text-white font-medium text-sm shadow-md shadow-orange-200 transition active:scale-95 cursor-pointer">
+                    <i class="fa-solid fa-dice animate-bounce"></i>
+                    <span>纠结？帮我随机选！</span>
+                </button>
+            </div>
+
+            <!-- 食物分类标签栏 -->
+            <div class="flex gap-2 overflow-x-auto no-scrollbar py-4" id="category-tabs">
+                <!-- 由 JS 动态渲染 -->
+            </div>
+
+            <!-- 食物网格列表 -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3" id="food-grid">
+                <!-- 由 JS 动态渲染 -->
+            </div>
+
+            <!-- 自定义添加食物 -->
+            <div class="mt-5 pt-4 border-t border-rose-100/80 flex gap-2">
+                <input type="text" id="custom-food-input" placeholder="菜单里没有？输入你想吃的（如：螺蛳粉、烤冷面）..." 
+                    class="flex-1 px-4 py-2.5 rounded-2xl bg-white/90 border border-rose-200 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400 placeholder-gray-400"
+                    onkeypress="if(event.key === 'Enter') addCustomFood()">
+                <button onclick="addCustomFood()" class="px-5 py-2.5 rounded-2xl bg-rose-100 hover:bg-rose-200 text-rose-600 font-medium text-sm transition active:scale-95 whitespace-nowrap cursor-pointer">
+                    <i class="fa-solid fa-plus mr-1"></i>添加
+                </button>
+            </div>
+        </section>
+
+        <!-- 步骤 2: 专属需求与撒娇备注 -->
+        <section class="glass-card rounded-3xl p-5 sm:p-6 shadow-lg shadow-rose-100/50">
+            <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2 mb-3">
+                <span class="w-7 h-7 rounded-full bg-rose-500 text-white flex items-center justify-center text-sm">2</span>
+                提点小要求 & 撒娇备注
+            </h2>
+
+            <!-- 快捷需求标签 -->
+            <div class="mb-3">
+                <p class="text-xs text-gray-400 mb-2">点击快捷添加贴心标签：</p>
+                <div class="flex flex-wrap gap-2" id="quick-tags">
+                    <!-- JS 渲染 -->
+                </div>
+            </div>
+
+            <!-- 需求文本输入框 -->
+            <textarea id="notes-input" rows="3" placeholder="在这里写下你的特别需求吧～ 比如：不要香菜、要微辣、顺便帮我带一杯冰美式，或者我想你啦快点回来！💕"
+                class="w-full p-4 rounded-2xl bg-white/90 border border-rose-200 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400 placeholder-gray-400 resize-none"></textarea>
+
+            <!-- 饿肚子的紧急程度 -->
+            <div class="mt-4">
+                <label class="text-xs font-medium text-gray-500 block mb-2">当前饥饿指数：</label>
+                <div class="grid grid-cols-3 gap-2.5" id="urgency-options">
+                    <button type="button" onclick="selectUrgency('不急，慢慢来~ 🐢')" class="urgency-btn active px-3 py-2.5 rounded-2xl border border-rose-400 bg-rose-50 text-rose-600 text-xs sm:text-sm font-medium transition text-center cursor-pointer">
+                        🐢 不急，慢慢来
+                    </button>
+                    <button type="button" onclick="selectUrgency('有点饿了，快投喂 🥺')" class="urgency-btn px-3 py-2.5 rounded-2xl border border-gray-200 bg-white/80 text-gray-600 text-xs sm:text-sm font-medium hover:border-rose-200 transition text-center cursor-pointer">
+                        🥺 有点饿了
+                    </button>
+                    <button type="button" onclick="selectUrgency('饿扁啦！十万火急 🚨')" class="urgency-btn px-3 py-2.5 rounded-2xl border border-gray-200 bg-white/80 text-gray-600 text-xs sm:text-sm font-medium hover:border-rose-200 transition text-center cursor-pointer">
+                        🚨 饿扁啦！火急
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 步骤 3: 填写对方 Gmail 并发送 -->
+        <section class="glass-card rounded-3xl p-5 sm:p-6 shadow-lg shadow-rose-100/50">
+            <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2 mb-4">
+                <span class="w-7 h-7 rounded-full bg-rose-500 text-white flex items-center justify-center text-sm">3</span>
+                发送给专属投喂官
+            </h2>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1.5">对他的爱称（收件人称呼）</label>
+                    <input type="text" id="partner-name" value="亲爱的宝贝" placeholder="例如：老公、大厨、猪猪"
+                        class="w-full px-4 py-2.5 rounded-2xl bg-white/90 border border-rose-200 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1.5">对方的 Gmail 邮箱地址 <span class="text-rose-400">*</span></label>
+                    <input type="email" id="partner-email" placeholder="example@gmail.com"
+                        class="w-full px-4 py-2.5 rounded-2xl bg-white/90 border border-rose-200 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400">
+                </div>
+            </div>
+
+            <!-- 已选食物预览清单 -->
+            <div class="bg-rose-50/80 rounded-2xl p-4 border border-rose-100 mb-5">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-bold text-rose-600 uppercase tracking-wider">💌 即将发送的点餐清单</span>
+                    <button onclick="clearSelection()" class="text-xs text-gray-400 hover:text-rose-500 underline cursor-pointer">清空重选</button>
+                </div>
+                <div id="selected-summary" class="text-sm text-gray-700 min-h-[28px] flex flex-wrap gap-1.5 items-center">
+                    <span class="text-gray-400 italic text-xs">还没有选择任何食物哦，快去上面挑一挑吧~</span>
+                </div>
+            </div>
+
+            <!-- 发送按钮组 -->
+            <div class="flex flex-col sm:flex-row gap-3">
+                <button onclick="sendViaGmail()" class="flex-1 py-3.5 px-6 rounded-2xl bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-bold text-base shadow-lg shadow-rose-300/60 flex items-center justify-center gap-2.5 transition transform active:scale-98 cursor-pointer">
+                    <i class="fa-brands fa-google text-lg"></i>
+                    <span>打开 Gmail 发送订单</span>
+                </button>
+                <button onclick="copyOrderText()" class="py-3.5 px-5 rounded-2xl bg-white hover:bg-rose-50 text-rose-600 border border-rose-200 font-medium text-sm shadow-sm flex items-center justify-center gap-2 transition active:scale-98 cursor-pointer">
+                    <i class="fa-regular fa-copy"></i>
+                    <span>复制清单发微信</span>
+                </button>
+            </div>
+            <p class="text-center text-xs text-gray-400 mt-3">
+                点击“打开 Gmail”将自动为你填好收件人、浪漫标题与完整点餐内容 💌
+            </p>
+        </section>
+    </main>
+
+    <!-- 随机抽取弹窗 (Modal) -->
+    <div id="random-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 text-center shadow-2xl border border-rose-100 transform transition-all">
+            <div class="w-16 h-16 bg-rose-100 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl animate-float">
+                🎰
+            </div>
+            <h3 class="text-xl font-cute text-gray-800 mb-1">命运的美食转盘</h3>
+            <p class="text-xs text-gray-400 mb-5">不知道吃什么？让缘分来决定吧！</p>
+            
+            <div class="py-6 px-4 bg-gradient-to-br from-rose-50 to-pink-50 rounded-2xl border border-rose-200 mb-6">
+                <div id="slot-emoji" class="text-5xl mb-2">🍱</div>
+                <div id="slot-name" class="text-xl font-bold text-rose-600">点击下方开始抽取</div>
+            </div>
+
+            <div class="flex gap-3">
+                <button onclick="closeRandomModal()" class="flex-1 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 text-sm font-medium transition cursor-pointer">
+                    取消
+                </button>
+                <button id="spin-btn" onclick="spinFood()" class="flex-1 py-2.5 rounded-xl bg-rose-500 hover:bg-rose-600 text-white text-sm font-bold shadow-md shadow-rose-200 transition cursor-pointer">
+                    开始抽取！
+                </button>
+                <button id="accept-spin-btn" onclick="acceptSpunFood()" class="hidden flex-1 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-bold shadow-md shadow-emerald-200 transition cursor-pointer">
+                    就吃这个！
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 提示消息 Toast (替代 alert) -->
+    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-none opacity-0 transition-all duration-300 transform translate-y-4">
+        <div class="bg-gray-800/95 text-white px-5 py-3 rounded-full shadow-xl text-sm font-medium flex items-center gap-2 backdrop-blur-md">
+            <span id="toast-icon">✨</span>
+            <span id="toast-msg">提示信息</span>
+        </div>
+    </div>
+
+    <script>
+        // ================= 数据配置区 =================
+        const foodCategories = [
+            { id: 'all', name: '全部美食', icon: '🍽️' },
+            { id: 'chinese', name: '中餐热炒', icon: '🥢' },
+            { id: 'hotpot', name: '火锅烧烤', icon: '🍲' },
+            { id: 'western', name: '西餐日韩', icon: '🍔' },
+            { id: 'snack', name: '小吃夜宵', icon: '🍢' },
+            { id: 'drink', name: '奶茶甜点', icon: '🧋' }
+        ];
+
+        let foodItems = [
+            { id: 1, name: '香辣小龙虾', emoji: '🦞', category: 'snack' },
+            { id: 2, name: '川味九宫格火锅', emoji: '🍲', category: 'hotpot' },
+            { id: 3, name: '日式豚骨拉面', emoji: '🍜', category: 'western' },
+            { id: 4, name: '滋滋烤五花肉', emoji: '🥓', category: 'hotpot' },
+            { id: 5, name: '芝士牛肉汉堡', emoji: '🍔', category: 'western' },
+            { id: 6, name: '三文鱼寿司拼盘', emoji: '🍣', category: 'western' },
+            { id: 7, name: '家常番茄炒蛋', emoji: '🍅', category: 'chinese' },
+            { id: 8, name: '糖醋排骨', emoji: '🍖', category: 'chinese' },
+            { id: 9, name: '麻辣烫/冒菜', emoji: '🥘', category: 'hotpot' },
+            { id: 10, name: '炸鸡配快乐水', emoji: '🍗', category: 'snack' },
+            { id: 11, name: '珍珠奶茶去冰', emoji: '🧋', category: 'drink' },
+            { id: 12, name: '草莓奶油蛋糕', emoji: '🍰', category: 'drink' },
+            { id: 13, name: '酸菜鱼', emoji: '🐟', category: 'chinese' },
+            { id: 14, name: '羊肉串烧烤', emoji: '🍢', category: 'snack' },
+            { id: 15, name: '意式肉酱面', emoji: '🍝', category: 'western' },
+            { id: 16, name: '杨枝甘露', emoji: '🥭', category: 'drink' }
+        ];
+
+        const quickRequirementTags = [
+            '🌶️ 少辣/微辣',
+            '🌿 不要香菜',
+            '🧄 不要葱蒜',
+            '🧋 顺便带杯奶茶',
+            '🧊 饮料要少冰',
+            '🤗 附带一个大抱抱',
+            '😘 亲亲才能吃得下',
+            '🛵 麻烦帮我点外卖'
+        ];
+
+        // ================= 状态管理 =================
+        let currentCategory = 'all';
+        let selectedFoodIds = new Set();
+        let selectedUrgency = '不急，慢慢来~ 🐢';
+        let currentSpunFood = null;
+        let spinInterval = null;
+
+        // ================= 初始化渲染 =================
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCategories();
+            renderFoods();
+            renderQuickTags();
+        });
+
+        // 渲染分类标签
+        function renderCategories() {
+            const container = document.getElementById('category-tabs');
+            container.innerHTML = foodCategories.map(cat => {
+                const isActive = cat.id === currentCategory;
+                return `
+                    <button onclick="switchCategory('${cat.id}')" 
+                        class="px-4 py-2 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition flex items-center gap-1.5 cursor-pointer
+                        ${isActive 
+                            ? 'bg-rose-500 text-white shadow-md shadow-rose-200' 
+                            : 'bg-white/80 text-gray-600 hover:bg-rose-100 hover:text-rose-600 border border-rose-100'}">
+                        <span>${cat.icon}</span>
+                        <span>${cat.name}</span>
+                    </button>
+                `;
+            }).join('');
+        }
+
+        // 切换分类
+        function switchCategory(catId) {
+            currentCategory = catId;
+            renderCategories();
+            renderFoods();
+        }
+
+        // 渲染食物卡片
+        function renderFoods() {
+            const container = document.getElementById('food-grid');
+            const filtered = currentCategory === 'all' 
+                ? foodItems 
+                : foodItems.filter(item => item.category === currentCategory);
+
+            container.innerHTML = filtered.map(item => {
+                const isSelected = selectedFoodIds.has(item.id);
+                return `
+                    <div onclick="toggleFood(${item.id})" 
+                        class="relative p-3.5 rounded-2xl border transition-all duration-200 cursor-pointer select-none flex flex-col items-center justify-center text-center group
+                        ${isSelected 
+                            ? 'bg-rose-50 border-rose-400 shadow-md shadow-rose-100 scale-[1.02]' 
+                            : 'bg-white/90 border-gray-100 hover:border-rose-200 hover:shadow-sm'}">
+                        
+                        <!-- 选中右上角小爱心 -->
+                        <div class="absolute top-2 right-2 w-5 h-5 rounded-full flex items-center justify-center text-xs transition
+                            ${isSelected ? 'bg-rose-500 text-white scale-100' : 'bg-gray-100 text-transparent scale-75 group-hover:scale-90'}">
+                            <i class="fa-solid fa-heart text-[10px]"></i>
+                        </div>
+
+                        <div class="text-3xl sm:text-4xl mb-1.5 transform group-hover:scale-110 transition">${item.emoji}</div>
+                        <div class="text-xs sm:text-sm font-medium ${isSelected ? 'text-rose-600 font-bold' : 'text-gray-700'}">
+                            ${item.name}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 切换选择食物
+        function toggleFood(id) {
+            if (selectedFoodIds.has(id)) {
+                selectedFoodIds.delete(id);
+            } else {
+                selectedFoodIds.add(id);
+            }
+            renderFoods();
+            updateSummary();
+        }
+
+        // 添加自定义食物
+        function addCustomFood() {
+            const input = document.getElementById('custom-food-input');
+            const name = input.value.trim();
+            if (!name) {
+                showToast('请先输入想吃的食物名称哦~', '🥺');
+                return;
+            }
+            const newId = Date.now();
+            const newFood = {
+                id: newId,
+                name: name,
+                emoji: '💖',
+                category: currentCategory === 'all' ? 'chinese' : currentCategory
+            };
+            foodItems.unshift(newFood);
+            selectedFoodIds.add(newId);
+            input.value = '';
+            renderFoods();
+            updateSummary();
+            showToast(`已将「${name}」加入心愿单！`, '✨');
+        }
+
+        // 渲染快捷备注标签
+        function renderQuickTags() {
+            const container = document.getElementById('quick-tags');
+            container.innerHTML = quickRequirementTags.map(tag => `
+                <button type="button" onclick="appendTag('${tag}')" 
+                    class="px-3 py-1.5 rounded-xl bg-white hover:bg-rose-50 text-gray-600 hover:text-rose-600 border border-rose-100 text-xs transition active:scale-95 cursor-pointer">
+                    ${tag}
+                </button>
+            `).join('');
+        }
+
+        // 追加备注标签到文本框
+        function appendTag(tag) {
+            const textarea = document.getElementById('notes-input');
+            const currentVal = textarea.value.trim();
+            if (currentVal.includes(tag)) {
+                showToast('这个要求已经添加过啦~', '😊');
+                return;
+            }
+            textarea.value = currentVal ? `${currentVal}，${tag}` : tag;
+        }
+
+        // 选择饥饿紧急程度
+        function selectUrgency(text) {
+            selectedUrgency = text;
+            const buttons = document.querySelectorAll('.urgency-btn');
+            buttons.forEach(btn => {
+                if (btn.textContent.trim().includes(text.split(' ')[0])) {
+                    btn.className = 'urgency-btn active px-3 py-2.5 rounded-2xl border border-rose-400 bg-rose-50 text-rose-600 text-xs sm:text-sm font-medium transition text-center cursor-pointer';
+                } else {
+                    btn.className = 'urgency-btn px-3 py-2.5 rounded-2xl border border-gray-200 bg-white/80 text-gray-600 text-xs sm:text-sm font-medium hover:border-rose-200 transition text-center cursor-pointer';
+                }
+            });
+        }
+
+        // 更新底部预览清单
+        function updateSummary() {
+            const container = document.getElementById('selected-summary');
+            if (selectedFoodIds.size === 0) {
+                container.innerHTML = `<span class="text-gray-400 italic text-xs">还没有选择任何食物哦，快去上面挑一挑吧~</span>`;
+                return;
+            }
+            const selectedItems = foodItems.filter(item => selectedFoodIds.has(item.id));
+            container.innerHTML = selectedItems.map(item => `
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white text-rose-600 border border-rose-200 text-xs font-medium shadow-xs">
+                    <span>${item.emoji}</span>
+                    <span>${item.name}</span>
+                    <button onclick="toggleFood(${item.id})" class="ml-1 text-rose-300 hover:text-rose-600 cursor-pointer">&times;</button>
+                </span>
+            `).join('');
+        }
+
+        // 清空选择
+        function clearSelection() {
+            selectedFoodIds.clear();
+            renderFoods();
+            updateSummary();
+            showToast('已清空已选食物', '🧹');
+        }
+
+        // ================= 随机转盘逻辑 =================
+        function openRandomModal() {
+            const modal = document.getElementById('random-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.getElementById('accept-spin-btn').classList.add('hidden');
+            document.getElementById('spin-btn').textContent = '开始抽取！';
+        }
+
+        function closeRandomModal() {
+            clearInterval(spinInterval);
+            const modal = document.getElementById('random-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function spinFood() {
+            const spinBtn = document.getElementById('spin-btn');
+            const acceptBtn = document.getElementById('accept-spin-btn');
+            const emojiEl = document.getElementById('slot-emoji');
+            const nameEl = document.getElementById('slot-name');
+
+            spinBtn.disabled = true;
+            spinBtn.classList.add('opacity-50');
+            acceptBtn.classList.add('hidden');
+
+            let count = 0;
+            const totalSpins = 20;
+            clearInterval(spinInterval);
+
+            spinInterval = setInterval(() => {
+                const randomItem = foodItems[Math.floor(Math.random() * foodItems.length)];
+                emojiEl.textContent = randomItem.emoji;
+                nameEl.textContent = randomItem.name;
+                currentSpunFood = randomItem;
+                count++;
+
+                if (count >= totalSpins) {
+                    clearInterval(spinInterval);
+                    spinBtn.disabled = false;
+                    spinBtn.classList.remove('opacity-50');
+                    spinBtn.textContent = '再抽一次';
+                    acceptBtn.classList.remove('hidden');
+                }
+            }, 70);
+        }
+
+        function acceptSpunFood() {
+            if (currentSpunFood) {
+                selectedFoodIds.add(currentSpunFood.id);
+                renderFoods();
+                updateSummary();
+                showToast(`已选中「${currentSpunFood.name}」啦！`, '🎉');
+            }
+            closeRandomModal();
+        }
+
+        // ================= 生成邮件与发送逻辑 =================
+        function generateEmailContent() {
+            const partnerName = document.getElementById('partner-name').value.trim() || '亲爱的';
+            const notes = document.getElementById('notes-input').value.trim() || '没有特别要求，只要是你选的/做的我都喜欢！';
+            const selectedItems = foodItems.filter(item => selectedFoodIds.has(item.id));
+            const foodListText = selectedItems.map((item, idx) => `${idx + 1}. ${item.emoji} ${item.name}`).join('\n');
+
+            const subject = `💌 【专属投喂申请】${partnerName}，我今天想吃这些！`;
+            const body = 
+`亲爱的 ${partnerName}：
+
+见信如面！你的专属小可爱向你发来了一份今日份的【爱心点餐申请】💕
+
+🍽️ 【今天想吃的美食】：
+${foodListText}
+
+📝 【专属小要求 & 备注】：
+${notes}
+
+⏰ 【当前饥饿程度】：
+${selectedUrgency}
+
+麻烦我的专属投喂官收到后尽快批示执行哦～爱你么么哒！😘❤️`;
+
+            return { subject, body };
+        }
+
+        function sendViaGmail() {
+            if (selectedFoodIds.size === 0) {
+                showToast('请至少选择一种想吃的食物哦！', '🍽️');
+                return;
+            }
+
+            const emailInput = document.getElementById('partner-email').value.trim();
+            if (!emailInput) {
+                showToast('请填写对方的 Gmail 邮箱地址~', '📧');
+                document.getElementById('partner-email').focus();
+                return;
+            }
+
+            const { subject, body } = generateEmailContent();
+
+            // 构造 Gmail 网页版撰写链接（在电脑和手机浏览器上都能直接唤起 Gmail 填好内容）
+            const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(emailInput)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            
+            showToast('正在为你打开 Gmail 发送页面...', '🚀');
+            window.open(gmailUrl, '_blank');
+        }
+
+        function copyOrderText() {
+            if (selectedFoodIds.size === 0) {
+                showToast('请至少选择一种想吃的食物哦！', '🍽️');
+                return;
+            }
+            const { subject, body } = generateEmailContent();
+            const fullText = `${subject}\n\n${body}`;
+
+            // 使用兼容性最好的 execCommand 复制文本
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = fullText;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            try {
+                document.execCommand('copy');
+                showToast('点餐情书已复制！快去粘贴发送吧 💕', '📋');
+            } catch (err) {
+                showToast('复制失败，请手动选择复制', '❌');
+            }
+            document.body.removeChild(tempTextArea);
+        }
+
+        // 自定义轻提示 Toast
+        let toastTimeout;
+        function showToast(message, icon = '✨') {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').textContent = message;
+            document.getElementById('toast-icon').textContent = icon;
+
+            toast.classList.remove('opacity-0', 'translate-y-4');
+            toast.classList.add('opacity-100', 'translate-y-0');
+
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('opacity-100', 'translate-y-0');
+                toast.classList.add('opacity-0', 'translate-y-4');
+            }, 2800);
+        }
+    </script>
+</body>
+</html>
